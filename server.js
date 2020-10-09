@@ -33,15 +33,14 @@ app.get("/notes", function (req, res) {
 
 //Set up API ROUTES
   // Parse note object
-
+  // Create function to read current note data
 function readNotesDb(){
 let dbData = fs.readFileSync("db/db.json", "utf8");
 dbData = JSON.parse(dbData)
 return dbData
 }
 
-
-
+// Function used to write new notes to the database.
 function writeNotesDb(data){
   const dbData = fs.writeFileSync("db/db.json", JSON.stringify(data))
 }
@@ -54,33 +53,39 @@ app.get("/api/notes", function (req, res) {
   res.json(noteData)
 });
 
-
-//TODO: Set up POST /api/notes should recieve a new note to save on the request body.
+//Set up POST /api/notes should recieve a new note to save on the request body.
+  // Add new note to db.json file.
+    // Return new note to client.
 
 app.post("/api/notes", function (req, res) {
   const noteData = readNotesDb();
-  noteData.push(req.body);
-  
+  const userInput = req.body
+  userInput.id = Math.random() * 20;
+  noteData.push(userInput);
+  console.log(req.body);
   writeNotesDb(noteData)
   res.send("Hope this works!")
 })
 
-//TODO: Add new note to db.json file
-//TODO: Return new note to client.
 
 // DELETE
 // =======================================================
 //TODO: delete api/notes/:id
 app.get("api/clear", function(req,res){
   noteData = readNotesDb()
-  noteData=[];
+  for(i=0; i < noteData.length; i++){
+    if(noteData[i].id===parseInt(req.params.id)){
+      noteData[i]=[];
+    }
+  }
+  
   res.send("clear")
 })
 //TODO: receive a query parameter w/ id of note to delete.
 //TODO: loop through db.json file to find propper id and remove note.
 //TODO: rewrite the notes to the db.json file.
 
-//TODO: Set up listener
+
 
 
 
@@ -89,6 +94,7 @@ app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname, "public/index.html"));
 });
 // =======================================================
+// Set up listener
 app.listen(PORT, function () {
   console.log("App listening on PORT " + PORT);
 });
